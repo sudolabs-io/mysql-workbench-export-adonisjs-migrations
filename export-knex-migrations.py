@@ -111,7 +111,6 @@ foreignKeyTemplate = '''
 '''
 
 migrationDownTemplate = '''
-
 exports.down = (knex) => {
 '''
 
@@ -120,9 +119,7 @@ schemaCreateTemplate = '''
 '''
 
 indexKeyTemplate = '''
-    table
-      .{indexType}([{indexColumns}], '{indexName}')
-'''
+    table.{indexType}([{indexColumns}], '{indexName}')'''
 
 migrationEndingTemplate = '''  knex.schema.dropTableIfExists('{tableName}')
 }}
@@ -319,11 +316,10 @@ def generate_knex_migration(cat):
                 elif col.defaultValue != '':
                   default_value = col.defaultValue.replace("'", "")
 
-                  # if default_value in default_time_values:
-                  #   # UMMMMMM, IS THIS GONNA WORK ?
-                  #   migrations[ti].append(".defaultTo(this.fn.now())".format(default_value))
-                  # else:
-                  migrations[ti].append(".defaultTo('{}')".format(default_value))
+                  if default_value in default_time_values:
+                    migrations[ti].append(".defaultTo(knex.fn.now())")
+                  else:
+                    migrations[ti].append(".defaultTo('{}')".format(default_value))
 
                 if col == primary_col:
                   migrations[ti].append('.primary()')
@@ -331,7 +327,7 @@ def generate_knex_migration(cat):
                 if col.comment != '':
                   migrations[ti].append(".comment('{comment}')".format(comment=addslashes(col.comment)))
 
-                # migrations[ti].append('\n')
+                migrations[ti].append('\n')
 
             except AttributeError:
               pass
@@ -350,16 +346,21 @@ def generate_knex_migration(cat):
             for column in index.columns:
               indexes[index_type][index_name].append(column.referencedColumn.name)
 
+          indexes_created = False
           for index_type in indexes:
             for index_name in indexes[index_type]:
               if len(indexes[index_type][index_name]) != 0:
+                indexes_created = True
                 index_key_template = indexKeyTemplate.format(
                   indexType=index_type,
-                  indexColumns=", ".join(['"{}"'.format(column_name) for column_name in
+                  indexColumns=", ".join(["'{}'".format(column_name) for column_name in
                               indexes[index_type][index_name]]),
                   indexName=index_name
                 )
                 migrations[ti].append(index_key_template)
+
+          if indexes_created:
+            migrations[ti].append('\n')
 
           if timestamps is True:
             migrations[ti].append('    table.timestamps()\n')
@@ -395,8 +396,8 @@ def generate_knex_migration(cat):
                   foreignKeyName=index_name,
                   tableKeyName=key.referencedColumns[0].name,
                   foreignTableName=key.referencedColumns[0].owner.name,
-                  onDeleteAction=delete_rule.lower(),
-                  onUpdateAction=update_rule.lower()
+                  onDeleteAction=delete_rule,
+                  onUpdateAction=update_rule
                 ))
 
               else:
@@ -439,15 +440,12 @@ def generate_knex_migration(cat):
                     foreignKeyName=item['name'],
                     tableKeyName=item['referenced_name'],
                     foreignTableName=item['referenced_table'],
-                    onDeleteAction=item['delete_rule'].lower(),
-                    onUpdateAction=item['update_rule'].lower()
+                    onDeleteAction=item['delete_rule'],
+                    onUpdateAction=item['update_rule']
                   ))
 
-              if schema_table == 1:
-                # migrations[ti].append("        })\n")
-                migrations[ti].append('\n')
-
           migrations[ti].append('  })\n')
+          migrations[ti].append('}\n')
 
           ##########
           # Reverse
@@ -473,9 +471,8 @@ def generate_knex_migration(cat):
     Workbench.confirm(e.typ, e.message)
     return 1
 
-  unixTimestamp = long(time.strftime('%Y%m%d%H%M%S'))
+  unixTimestamp = time.strftime('%Y%m%d%H%M%S')
   for name in sorted(migrations):
-    unixTimestamp += 1
     save_format = '{timestamp}_add_{tableName}_table.js'.format(
       timestamp=unixTimestamp,
       tableName=migration_tables[name]
@@ -531,9 +528,8 @@ class GenerateKnexMigrationWizardPreviewPage(WizardPage):
 
       i = len(glob.glob(path + "/*_table.js"))
 
-      unixTimestamp = long(time.strftime('%Y%m%d%H%M%S'))
+      unixTimestamp = time.strftime('%Y%m%d%H%M%S')
       for key in sorted(migrations):
-        unixTimestamp += 1
         try:
           search_format = "*_{tableName}_table.js".format(
             tableName=migration_tables[key]
