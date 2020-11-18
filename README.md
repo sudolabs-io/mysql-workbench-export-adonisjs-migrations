@@ -1,6 +1,6 @@
-# MySQL Workbench Export AdonisJS/Knex Migrations Plugin
+# MySQL Workbench Export Knex Migrations Plugin
 
-A MySQL Workbench plugin that allows for exporting a model to **AdonisJS** migrations that follow PSR-2 coding standards. This plugin will be useful while porting from someother framework to **AdonisJS** or any frameworks that uses **Knex library**. When exported, each migration is generated and saved in it's own, properly named, migration file.
+A MySQL Workbench plugin that allows for exporting a model to **Knex** migrations. This plugin will be useful while porting from someother framework to any frameworks that uses **Knex library**. When exported, each migration is generated and saved in it's own, properly named, migration file.
 
 ### Version
 1.0.0
@@ -22,7 +22,7 @@ And of course this plugin is open source with a [public repository](https://gith
 ### Usage
 
  - Open a model in MySQL Workbench
- - Tools > Catalog > Export **AdonisJS** Migration
+ - Tools > Catalog > Export Knex Migration
 
 ### Development
 
@@ -34,26 +34,12 @@ Thanks to [all](https://github.com/beckenrode/mysql-workbench-export-laravel-5-m
 this MySQL Workbench plugin for exporting AdonisJS migrations wouldn't have been
 possible.
 
-### Todos
 
- -	Create a single plugin which can migrate for **adonisjs**, **laravel** etc
- 	(For [laravel migrations](https://github.com/beckenrode/mysql-workbench-export-laravel-5-migrations)).
- 
- -	Add migrations for frameworks which allows migrations.
-
- -	Create plugin for **SQLPro**.
-
- -	Make everything standalone.
-
-
-Developed By
----- 
+### Developed By
 
 Mahendaran Elangovan [(ME-Studio)](https://mestudio.herokuapp.com/)
+Martin Bórik - modification to Knex ES6 lambda notation
 
-License
-----
+### License
 
 The MIT License (MIT)
-
-**Feel Free To Dig In**
