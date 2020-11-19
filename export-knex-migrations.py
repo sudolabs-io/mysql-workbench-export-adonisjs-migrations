@@ -98,7 +98,7 @@ typesDict = {
 }
 
 migrationTemplate = '''exports.up = (knex) => {{
-  knex.schema.createTable('{tableName}', (table) => {{
+  return knex.schema.createTable('{tableName}', (table) => {{
 '''
 
 foreignKeyTemplate = '''
@@ -121,7 +121,7 @@ schemaCreateTemplate = '''
 indexKeyTemplate = '''
     table.{indexType}([{indexColumns}], '{indexName}')'''
 
-migrationEndingTemplate = '''  knex.schema.dropTableIfExists('{tableName}')
+migrationEndingTemplate = '''  return knex.schema.dropTableIfExists('{tableName}')
 }}
 '''
 
